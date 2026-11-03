@@ -1,0 +1,71 @@
+name: LLM Quality Gate & Regression Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  repository_dispatch:
+    types: [agent-staging-deployed]
+  workflow_dispatch:
+    inputs:
+      agent_api_url:
+        description: "Staging Agent API URL to evaluate against Golden Dataset"
+        required: false
+        default: "http://localhost:8080"
+      mode:
+        description: "Evaluation mode (offline or live)"
+        required: false
+        default: "offline"
+
+jobs:
+  unit-and-deterministic-tests:
+    name: Deterministic & Statistical Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Eval Pipeline Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run Pytest Suite
+        run: pytest -v
+
+  golden-dataset-quality-gate:
+    name: Golden Dataset CI/CD Gate (Faithfulness >= 0.90, CSR >= 0.95)
+    needs: unit-and-deterministic-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Eval Pipeline Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Execute CI Regression Gate
+        env:
+          AGENT_API_URL: ${{ github.event.inputs.agent_api_url || 'http://localhost:8080' }}
+        run: |
+          python -m workers.ci_regression --mode ${{ github.event.inputs.mode || 'offline' }} --output-json regression_report.json
+
+      - name: Upload Quality Gate Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-quality-gate-report
+          path: regression_report.json

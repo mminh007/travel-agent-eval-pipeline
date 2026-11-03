@@ -1,0 +1,84 @@
+# docker-compose.yml — Travel Agent Offline Evaluation Pipeline
+# Safe Port Allocation (Zero collisions with booking-agent-system):
+#   - 9091: Prometheus Pushgateway (scraped by booking_prometheus:9090)
+#   - 8088: Eval Pipeline FastAPI Server (CI/CD webhook, A/B reports, HITL API)
+#   - 8089: Hourly Scorer & HITL Worker Health Endpoint
+#   - 9092: Optional Standalone Prometheus (--profile standalone)
+#   - 3002: Optional Standalone Grafana (--profile standalone)
+
+name: travel-agent-eval-pipeline
+
+services:
+  # ─── 1. PROMETHEUS PUSHGATEWAY (Port 9091) ───
+  eval_pushgateway:
+    image: prom/pushgateway:v1.9.0
+    container_name: eval_pushgateway
+    ports:
+      - "9091:9091"
+    restart: always
+    networks:
+      - agent_network
+
+  # ─── 2. EVAL PIPELINE FASTAPI SERVER (Port 8088) ───
+  eval_api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: eval_api_server
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8088"]
+    ports:
+      - "8088:8088"
+    environment:
+      - LANGFUSE_HOST=${LANGFUSE_HOST:-http://langfuse_server:3000}
+      - AGENT_API_URL=${AGENT_API_URL:-http://agent_api:8080}
+      - PUSHGATEWAY_URL=http://eval_pushgateway:9091
+      - EVAL_API_PORT=8088
+    env_file:
+      - .env
+    depends_on:
+      - eval_pushgateway
+    restart: always
+    networks:
+      - agent_network
+
+  # ─── 3. HOURLY ASYNC SCORER & HITL QUEUE WORKER (Health Port 8089) ───
+  eval_worker:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: eval_hourly_worker
+    command: ["python", "-m", "workers.hourly_scorer", "--daemon"]
+    ports:
+      - "8089:8089"
+    environment:
+      - LANGFUSE_HOST=${LANGFUSE_HOST:-http://langfuse_server:3000}
+      - AGENT_API_URL=${AGENT_API_URL:-http://agent_api:8080}
+      - PUSHGATEWAY_URL=http://eval_pushgateway:9091
+      - EVAL_WORKER_HEALTH_PORT=8089
+    env_file:
+      - .env
+    depends_on:
+      - eval_pushgateway
+    restart: always
+    networks:
+      - agent_network
+
+  # ─── 4. OPTIONAL STANDALONE GRAFANA (Port 3002 — Avoids 3000 Langfuse & 3001 Agent Grafana) ───
+  eval_grafana:
+    image: grafana/grafana:10.4.1
+    container_name: eval_standalone_grafana
+    profiles:
+      - standalone
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    restart: always
+    networks:
+      - agent_network
+
+networks:
+  agent_network:
+    external: true

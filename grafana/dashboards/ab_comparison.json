@@ -1,0 +1,59 @@
+{
+  "uid": "travel-agent-ab-comparison",
+  "title": "Travel Agent — Model A/B Testing & Statistical Significance",
+  "tags": ["llmops", "ab-testing", "significance", "mann-whitney"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Variant Sample Sizes (Min Required: 500 per variant)",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "agent_ab_test_sample_size",
+          "legendFormat": "{{model_variant}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "Two-Tailed p-values by Metric (Alpha = 0.05)",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "agent_ab_test_p_value",
+          "legendFormat": "{{metric_name}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Constraint Satisfaction Rate (CSR) Distribution",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "rate(agent_constraint_satisfaction_rate_sum[1h]) / rate(agent_constraint_satisfaction_rate_count[1h])",
+          "legendFormat": "Average CSR"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Forced Accept Rate Comparison (Model A vs Model B)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        {
+          "expr": "rate(agent_forced_accept_total[1h])",
+          "legendFormat": "Forced Accept ({{model_variant}})"
+        }
+      ]
+    }
+  ]
+}

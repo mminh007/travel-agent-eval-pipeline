@@ -1,0 +1,21 @@
+# Quality Gate & HITL Thresholds Configuration
+quality_gates:
+  faithfulness_min: 0.90
+  answer_relevance_min: 0.85
+  context_precision_min: 0.80
+  context_recall_min: 0.85
+  constraint_satisfaction_rate_min: 0.95
+  deterministic_pass_rate_min: 1.00
+
+hitl_triggers:
+  consistency_score_min: 0.75
+  max_contradictions: 0
+  max_ungrounded_claims: 2
+  min_eval_dimension_score: 5
+  max_rework_cycles: 2
+  flag_on_deterministic_failure: true
+
+confusion_matrix_targets:
+  fact_checker_recall_min: 0.90
+  input_guardrail_precision_min: 0.95
+  evaluator_f1_min: 0.85

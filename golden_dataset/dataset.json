@@ -1,0 +1,103 @@
+[
+  {
+    "id": "GD-001",
+    "question": "Tìm khách sạn ở Đà Nẵng có hồ bơi và ban công, giá dưới 2000000 VND mỗi đêm từ 2026-12-10 đến 2026-12-12.",
+    "intent_category": "hotel_booking",
+    "expected_language": "Vietnamese",
+    "expected_tool": "search_hotels",
+    "user_budget": 2000000,
+    "check_in": "2026-12-10",
+    "check_out": "2026-12-12",
+    "reference_date": "2026-11-03",
+    "user_constraints": ["Đà Nẵng", "hồ bơi", "ban công", "1500000"],
+    "claimed_entities": ["HTL-DN-101", "Sala Danang Beach Hotel"],
+    "claimed_prices": [1500000],
+    "tool_observations": [
+      {
+        "hotel_id": "HTL-DN-101",
+        "name": "Sala Danang Beach Hotel",
+        "city": "Đà Nẵng",
+        "price_per_night": 1500000,
+        "amenities": ["hồ bơi", "ban công", "ăn sáng miễn phí"],
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-12"
+      }
+    ],
+    "reference_ground_truth": "Khách sạn Sala Danang Beach Hotel (mã HTL-DN-101) tại Đà Nẵng có giá 1500000 VND mỗi đêm từ 2026-12-10 đến 2026-12-12, đầy đủ tiện ích hồ bơi và ban công.",
+    "baseline_response": "Khách sạn Sala Danang Beach Hotel (mã HTL-DN-101) ở Đà Nẵng có giá 1500000 VND mỗi đêm từ 2026-12-10 đến 2026-12-12. Phòng có đầy đủ hồ bơi và ban công hướng biển."
+  },
+  {
+    "id": "GD-002",
+    "question": "Find a pet-friendly hotel in Da Lat under 1800000 VND from 2026-12-20 to 2026-12-23 with mountain view.",
+    "intent_category": "hotel_booking",
+    "expected_language": "English",
+    "expected_tool": "search_hotels",
+    "user_budget": 1800000,
+    "check_in": "2026-12-20",
+    "check_out": "2026-12-23",
+    "reference_date": "2026-11-03",
+    "user_constraints": ["Da Lat", "pet-friendly", "mountain view", "1450000"],
+    "claimed_entities": ["HTL-DL-204", "Pine Hill Eco Lodge"],
+    "claimed_prices": [1450000],
+    "tool_observations": [
+      {
+        "hotel_id": "HTL-DL-204",
+        "name": "Pine Hill Eco Lodge",
+        "city": "Da Lat",
+        "price_per_night": 1450000,
+        "amenities": ["pet-friendly", "mountain view", "fireplace"],
+        "check_in": "2026-12-20",
+        "check_out": "2026-12-23"
+      }
+    ],
+    "reference_ground_truth": "Pine Hill Eco Lodge (HTL-DL-204) in Da Lat is pet-friendly with a mountain view at 1450000 VND per night for 2026-12-20 to 2026-12-23.",
+    "baseline_response": "Pine Hill Eco Lodge (HTL-DL-204) in Da Lat offers pet-friendly rooms with a mountain view for 1450000 VND per night from 2026-12-20 to 2026-12-23."
+  },
+  {
+    "id": "GD-003",
+    "question": "Lên lịch trình 3 ngày 2 đêm ở Phú Quốc từ 2026-12-05 đến 2026-12-07 với khách sạn Sol by Melia.",
+    "intent_category": "itinerary_planning",
+    "expected_language": "Vietnamese",
+    "expected_tool": "plan_itinerary",
+    "user_budget": 3000000,
+    "check_in": "2026-12-05",
+    "check_out": "2026-12-07",
+    "reference_date": "2026-11-03",
+    "user_constraints": ["Phú Quốc", "Sol by Melia", "2200000"],
+    "claimed_entities": ["HTL-PQ-305", "Sol by Melia"],
+    "claimed_prices": [2200000],
+    "tool_observations": [
+      {
+        "hotel_id": "HTL-PQ-305",
+        "name": "Sol by Melia",
+        "city": "Phú Quốc",
+        "price_per_night": 2200000,
+        "itinerary_highlights": ["Bãi Trường", "Chợ đêm Phú Quốc", "Cáp treo Hòn Thơm"]
+      }
+    ],
+    "reference_ground_truth": "Lịch trình Phú Quốc từ 2026-12-05 đến 2026-12-07 nghỉ tại Sol by Melia (HTL-PQ-305) giá 2200000 VND mỗi đêm, tham quan Bãi Trường, Chợ đêm Phú Quốc và Cáp treo Hòn Thơm.",
+    "baseline_response": "Lịch trình Phú Quốc từ 2026-12-05 đến 2026-12-07 nghỉ tại Sol by Melia (HTL-PQ-305) với giá 2200000 VND mỗi đêm. Ngày 1 tham quan Bãi Trường và Chợ đêm Phú Quốc, ngày 2 đi Cáp treo Hòn Thơm."
+  },
+  {
+    "id": "GD-004",
+    "question": "Chính sách hoàn hủy phòng khách sạn trước 48 giờ tại hệ thống như thế nào?",
+    "intent_category": "travel_faq",
+    "expected_language": "Vietnamese",
+    "expected_tool": "retrieve_policy",
+    "user_budget": null,
+    "check_in": null,
+    "check_out": null,
+    "reference_date": "2026-11-03",
+    "user_constraints": ["hoàn tiền 100%", "48 giờ"],
+    "claimed_entities": ["POL-REFUND-48H"],
+    "claimed_prices": [],
+    "tool_observations": [
+      {
+        "policy_id": "POL-REFUND-48H",
+        "rule": "Khách hàng hủy phòng trước 48 giờ so với giờ check-in được hoàn tiền 100% qua phương thức thanh toán ban đầu."
+      }
+    ],
+    "reference_ground_truth": "Theo chính sách POL-REFUND-48H, khách hàng hủy phòng trước 48 giờ so với giờ check-in sẽ được hoàn tiền 100% qua phương thức thanh toán ban đầu.",
+    "baseline_response": "Theo chính sách POL-REFUND-48H, khách hàng hủy phòng trước 48 giờ so với giờ check-in được hoàn tiền 100% qua phương thức thanh toán ban đầu."
+  }
+]

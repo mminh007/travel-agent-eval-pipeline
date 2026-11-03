@@ -1,0 +1,171 @@
+{
+  "uid": "travel-agent-quality-overview",
+  "title": "Travel Agent — LLMOps Quality Control & HITL Overview",
+  "tags": ["llmops", "quality-control", "hitl", "ragas", "confusion-matrix"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Row 1 — Quality Score Overview (Faithfulness, Consistency & Eval Dimensions)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Fact-Check Consistency Score by Model Variant",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 },
+      "targets": [
+        {
+          "expr": "rate(agent_fact_check_consistency_score_sum[1h]) / rate(agent_fact_check_consistency_score_count[1h])",
+          "legendFormat": "{{model_variant}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "gauge",
+      "title": "Average Tool Quality Score (1-10) [Last 1h]",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 },
+      "targets": [
+        {
+          "expr": "rate(agent_llm_eval_score_sum{dimension=\"tool_quality\"}[1h]) / rate(agent_llm_eval_score_count{dimension=\"tool_quality\"}[1h])",
+          "legendFormat": "{{model_variant}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Hallucination Rate (1h) [Alert Threshold > 0]",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+      "targets": [
+        {
+          "expr": "sum by (model_variant, contradiction_type) (rate(agent_hallucination_detected_total[1h]))",
+          "legendFormat": "{{model_variant}} - {{contradiction_type}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "row",
+      "title": "Row 2 — Human-in-the-Loop (HITL) Review Queue & Deterministic Rule Checks",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Forced Accept Total (1h) — RED Canary Signal",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 10 },
+      "targets": [
+        {
+          "expr": "increase(agent_forced_accept_total[1h])",
+          "legendFormat": "{{model_variant}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Pending HITL Review Queue Size",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 10 },
+      "targets": [
+        {
+          "expr": "agent_hitl_pending_queue_size",
+          "legendFormat": "Pending Human Reviews"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Deterministic Rule Failures by Check Type",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 10 },
+      "targets": [
+        {
+          "expr": "increase(agent_deterministic_check_failures_total[1h])",
+          "legendFormat": "{{check_type}}"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "row",
+      "title": "Row 3 — A/B Testing Comparison (Model A vs Model B)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 }
+    },
+    {
+      "id": 10,
+      "type": "barchart",
+      "title": "Ragas Faithfulness & Answer Relevance by Model Variant",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
+      "targets": [
+        {
+          "expr": "rate(agent_ragas_faithfulness_score_sum[1h]) / rate(agent_ragas_faithfulness_score_count[1h])",
+          "legendFormat": "Faithfulness ({{model_variant}})"
+        },
+        {
+          "expr": "rate(agent_ragas_answer_relevance_score_sum[1h]) / rate(agent_ragas_answer_relevance_score_count[1h])",
+          "legendFormat": "Relevance ({{model_variant}})"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Sample Size per Variant (Target >= 500)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
+      "targets": [
+        {
+          "expr": "agent_ab_test_sample_size",
+          "legendFormat": "{{experiment_name}} - {{model_variant}}"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Row 4 — Conversation Health & Confusion Matrix (TP/FP/FN/TN)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 }
+    },
+    {
+      "id": 13,
+      "type": "histogram",
+      "title": "Turn-to-Resolution Distribution by Intent Category",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 28 },
+      "targets": [
+        {
+          "expr": "sum by (le, intent_category) (rate(agent_turn_to_resolution_bucket[1h]))",
+          "legendFormat": "{{intent_category}}"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Evaluator Rework Trigger Rate by Variant",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 28 },
+      "targets": [
+        {
+          "expr": "rate(agent_rework_triggered_total[1h])",
+          "legendFormat": "{{model_variant}} ({{complexity}})"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "barchart",
+      "title": "Node Confusion Matrix (TP / FP / FN / TN vs Human Ground Truth)",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 28 },
+      "targets": [
+        {
+          "expr": "agent_confusion_matrix_total",
+          "legendFormat": "{{node_name}} - {{outcome}}"
+        }
+      ]
+    }
+  ]
+}

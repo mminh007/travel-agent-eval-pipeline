@@ -1,0 +1,53 @@
+# A/B Testing & Statistical Significance Configuration
+experiment:
+  name: "model_comparison_v1"
+  control_variant: "model_a"
+  treatment_variant: "model_b"
+  traffic_split_treatment: 0.10
+  min_sample_size_per_variant: 500
+  significance_level_alpha: 0.05
+  minimum_statistical_power: 0.80
+
+decision_rules:
+  consistency_score_min: 0.90
+  constraint_satisfaction_rate_min: 0.95
+  ttft_p95_max_multiplier: 1.20
+  allow_forced_accept_increase: false
+  allow_rework_rate_increase: false
+
+metrics:
+  continuous:
+    - name: "faithfulness"
+      higher_is_better: true
+      test: "mann_whitney_u"
+    - name: "answer_relevance"
+      higher_is_better: true
+      test: "mann_whitney_u"
+    - name: "consistency_score"
+      higher_is_better: true
+      test: "mann_whitney_u"
+    - name: "constraint_satisfaction_rate"
+      higher_is_better: true
+      test: "mann_whitney_u"
+    - name: "latency_seconds"
+      higher_is_better: false
+      test: "mann_whitney_u"
+    - name: "ttft_seconds"
+      higher_is_better: false
+      test: "mann_whitney_u"
+    - name: "turn_to_resolution"
+      higher_is_better: false
+      test: "mann_whitney_u"
+  proportions:
+    - name: "forced_accept_rate"
+      higher_is_better: false
+      test: "chi_square"
+    - name: "rework_rate"
+      higher_is_better: false
+      test: "chi_square"
+    - name: "thumbs_down_rate"
+      higher_is_better: false
+      test: "chi_square"
+    - name: "goal_completion_rate"
+      higher_is_better: true
+      test: "chi_square"
